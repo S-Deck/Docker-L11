@@ -8,12 +8,12 @@
     ```
     https://thegeekpage.com/err-unsafe-port/
     ```
-3. Uruchomienie usług w przeglądarce na portach 6001 oraz 6666:
-    ```
-    http://localhost:6001/
-    ```
+3. Uruchomienie usług w przeglądarce na portach 6666 oraz 6001:
     ```
     http://localhost:6666/
+    ```
+    ```
+    http://localhost:6001/
     ```
 4. Zatrzymanie oraz usunięcie konterów:
     ```
