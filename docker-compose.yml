@@ -1,0 +1,72 @@
+version: "3.2"
+services:
+#kontener nginx
+  nginx:
+    #zbudowanie obrazu na bazie Dockerfile z katalogu "nginx"
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    #przekierowanie portu 6666 na port 80
+    ports:
+      - 6666:80
+    #usługa zostanie automatycznie uruchomiona, o ile nie została celowo zatrzymana
+    restart: unless-stopped
+    #podłączenie z siecią backend oraz frontend
+    networks:
+      - frontend
+      - backend
+    #załączenie katalogu "./data/" do katalogu "/var/www/html/" w kontenerze Nginx
+    volumes:
+      - ./data/:/var/www/html/
+
+#kontener mysql
+  mysql_db:
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    #domyślna wtyczka uwierzytelniania 
+    command: --default-authentication-plugin=mysql_native_password
+    #podłączenie z siecią backend
+    networks:
+      - backend
+    #usługa zostanie automatycznie uruchomiona, o ile nie została celowo zatrzymana
+    restart: unless-stopped
+    #obowiązkowa zmienna, określa hasło, które zostanie ustawione dla konta administratora MySQL
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      
+#kontener PHP-FPM
+  php:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    #podłączenie z siecią backend
+    networks:
+      - backend
+    #załączenie katalogu "./data/" do katalogu "/var/www/html/" w kontenerze PHP.
+    volumes:
+      - ./data/:/var/www/html/
+
+#kontener phpMyAdmin
+  phpmyadmin:
+    build:
+      context: ./phpmyadmin
+      dockerfile: Dockerfile
+    #podłączenie z siecią backend
+    networks:
+      - backend 
+    #przekierowanie portu 6001 na port 80 w kontenerze
+    ports:
+      - 6001:80
+    #usługa zostanie automatycznie uruchomiona, o ile nie została celowo zatrzymana
+    restart: unless-stopped
+    #uruchomienie phpMyAdmin z opcją dowolnego serwera - MySQL/MariaDB - na stronie logowania
+    environment:
+      - PMA_ARBITRARY=1
+
+#zdefiniowanie sieci "forntend" oraz "backend"
+networks:
+  frontend:
+    driver: bridge
+  backend:  
+    driver: bridge
